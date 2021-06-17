@@ -1,0 +1,32 @@
+[package]
+name = "ssd1320z2_demo"
+version = "0.1.0"
+authors = ["Boris Vinogradov <no111u3@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "ssd1320z2"
+path = "src/lib.rs"
+
+[dependencies]
+# These are fundamental cortex-m support crates
+cortex-m = "0.6.2"
+cortex-m-rt = "0.6.12"
+panic-halt = "0.2.0"
+embedded-hal = "0.2"
+rtt-target = { version = "0.2.0", features = ["cortex-m"] }
+panic-rtt-target = { version = "0.1.0", features = ["cortex-m"] }
+cortex-m-rtic = "0.5"
+display-interface = "0.4"
+display-interface-spi = "0.4"
+
+[dependencies.stm32f4xx-hal]
+version = "0.8"
+features = ["rt", "stm32f401"]
+
+[profile.release]
+# Many of these settings are highly recommended or required for embedded work
+codegen-units = 1
+incremental = false
+debug = true
+lto = true

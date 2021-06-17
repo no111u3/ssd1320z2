@@ -1,0 +1,35 @@
+[default.probe]
+protocol = "Swd"
+
+[default.flashing]
+# Whether or not the target should be flashed.
+enabled = true
+# Whether or not bytes erased but not rewritten with data from the ELF
+# should be restored with their contents before erasing.
+restore_unwritten_bytes = false
+# The path where an SVG of the assembled flash layout should be written to.
+# flash_layout_output_path = "out.svg"
+
+[default.reset]
+# Whether or not the target should be reset.
+# When flashing is enabled as well, the target will be reset after flashing.
+enabled = true
+# Whether or not the target should be halted after reset.
+halt_afterwards = false
+
+[default.general]
+chip = "stm32f401re"
+chip_descriptions = []
+log_level = "WARN"
+
+[default.rtt]
+enabled = false
+# A list of channel associations to be displayed. If left empty, all channels are displayed.
+channels = [
+    # { up = 0, down = 0, name = "name" }
+]
+timeout = 3000
+show_timestamps = true
+
+[default.gdb]
+enabled = false
