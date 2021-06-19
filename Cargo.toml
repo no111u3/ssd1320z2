@@ -5,7 +5,7 @@ authors = ["Boris Vinogradov <no111u3@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "ssd1320z2"
+name = "ssd1320"
 path = "src/lib.rs"
 
 [dependencies]

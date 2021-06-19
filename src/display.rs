@@ -3,37 +3,26 @@
 //! TODO: Create a normal documentation
 
 use crate::command::{AddrMode, Command, PortraitAddrMode, PreChargeLvl, VcomhLevel};
-use crate::error::Error;
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
-use display_interface_spi::{SPIInterface, SPIInterfaceNoCS};
-use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 /// SSD1320 driver.
 #[derive(Copy, Clone, Debug)]
-pub struct Ssd1320<DI, CS1, CS2> {
+pub struct Ssd1320<DI> {
     interface: DI,
-    cs1: CS1,
-    cs2: CS2,
 }
 
-impl<DI, CS1, CS2> Ssd1320<DI, CS1, CS2>
+impl<DI> Ssd1320<DI>
 where
     DI: WriteOnlyDataCommand,
-    CS1: OutputPin,
-    CS2: OutputPin,
 {
     /// Create a SSD1320 interface
-    pub fn new(interface: DI, cs1: CS1, cs2: CS2) -> Self {
-        Self {
-            interface,
-            cs1,
-            cs2,
-        }
+    pub fn new(interface: DI) -> Self {
+        Self { interface }
     }
 
     /// Initialise the display in one of the available addressing modes.
     /// TODO: Add address setup
-    pub fn init_one(
+    pub fn init(
         &mut self,
         display_offset: u8,
         regmap: bool,
@@ -63,26 +52,7 @@ where
         Ok(())
     }
 
-    pub fn init(&mut self) -> Result<(), DisplayError> {
-        self.cs1.set_low().ok();
-        self.cs2.set_high().ok();
-        self.init_one(0x0e, false, true)?;
-        self.cs2.set_low().ok();
-        self.cs1.set_high().ok();
-        self.init_one(0x92, true, false)?;
-        self.cs1.set_high().ok();
-        self.cs2.set_high().ok();
-
-        Ok(())
-    }
-
     pub fn draw(&mut self, buffer: &[u8]) -> Result<(), DisplayError> {
-        self.cs1.set_low().ok();
-        self.cs2.set_low().ok();
-        self.interface.send_data(U8(&buffer))?;
-        self.cs1.set_high().ok();
-        self.cs2.set_high().ok();
-
-        Ok(())
+        self.interface.send_data(U8(&buffer))
     }
 }
