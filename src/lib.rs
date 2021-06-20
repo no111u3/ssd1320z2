@@ -64,6 +64,14 @@ where
         Ok(())
     }
 
+    pub fn set_draw_area(&mut self, start: (u8, u8), end: (u8, u8)) -> Result<(), DisplayError> {
+        self.select_all();
+        self.interface.set_draw_area(start, end)?;
+        self.unselect_all();
+
+        Ok(())
+    }
+
     pub fn draw(&mut self, buffer: &[u8]) -> Result<(), DisplayError> {
         self.select_all();
         self.interface.draw(buffer)?;

@@ -52,7 +52,38 @@ where
         Ok(())
     }
 
+    /// Send a raw buffer to the display.
     pub fn draw(&mut self, buffer: &[u8]) -> Result<(), DisplayError> {
         self.interface.send_data(U8(&buffer))
+    }
+
+    /// Turn the display on or off. The display can be drawn to and retains all
+    /// of its memory even while off.
+    pub fn set_display_on(&mut self, on: bool) -> Result<(), DisplayError> {
+        Command::DisplayOn(on).send(&mut self.interface)
+    }
+
+    /// Set the position in the framebuffer of the display limiting where any sent data should be
+    /// drawn. This method can be used for changing the affected area on the screen as well
+    /// as (re-)setting the start point of the next `draw` call.
+    pub fn set_draw_area(&mut self, start: (u8, u8), end: (u8, u8)) -> Result<(), DisplayError> {
+        Command::ColumnAddress(start.0, end.0.saturating_sub(1)).send(&mut self.interface)?;
+
+        Command::RowAddress(start.1.into(), (end.1.saturating_sub(1)).into())
+            .send(&mut self.interface)?;
+
+        Ok(())
+    }
+
+    /// Set the column address (column 2px)in the framebuffer of the display where any sent data should be
+    /// drawn.
+    pub fn set_column(&mut self, column: u8) -> Result<(), DisplayError> {
+        Command::ColumnAddress(column, 160 / 2 - 1).send(&mut self.interface)
+    }
+
+    /// Set the page address in the framebuffer of the display where any sent data
+    /// should be drawn.
+    pub fn set_row(&mut self, row: u8) -> Result<(), DisplayError> {
+        Command::RowAddress(row, 0x83).send(&mut self.interface)
     }
 }

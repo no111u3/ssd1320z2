@@ -67,6 +67,8 @@ fn main() -> ! {
 
     display.init();
 
+    display.set_draw_area((10, 10), (40, 40));
+
     loop {
         delay.delay_ms(500_u16);
         for _ in 0..80 {
