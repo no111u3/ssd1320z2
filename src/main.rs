@@ -67,20 +67,38 @@ fn main() -> ! {
 
     display.init();
 
-    display.set_draw_area((10, 10), (40, 40));
+    display.set_draw_area((138, 78), (138 + 83, 78 + 23));
+    for _ in 0..(54 * 44) {
+        display.draw(&[0x00]);
+    }
+    display.set_draw_area((140, 80), (140 + 79, 80 + 19));
+    for i in 0..(50 * 40) {
+        display.draw(&[(i % 4) as u8 | (((i >> 2) % 4) << 2) as u8]);
+    }
+
+    let mut select_one = true;
 
     loop {
         delay.delay_ms(500_u16);
-        for _ in 0..80 {
-            display
-                .draw(&[0x77, 0x77, 0x77, 0x77, 0xff, 0xff, 0xff, 0xff])
-                .ok();
+        let (begin, end) = if select_one {
+            ((10, 10), (89, 89))
+        } else {
+            ((160 + 10, 10), (160 + 41, 41))
+        };
+        display.set_draw_area(begin, end);
+        for _ in 0..((end.1 - begin.1 + 1) / 16) {
+            for _ in 0..((end.0 - begin.0 + 1) / 2) {
+                display
+                    .draw(&[0x77, 0x77, 0x77, 0x77, 0xff, 0xff, 0xff, 0xff])
+                    .ok();
+            }
+            for _ in 0..((end.0 - begin.0 + 1) / 2) {
+                display
+                    .draw(&[0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00])
+                    .ok();
+            }
         }
-        for _ in 0..80 {
-            display
-                .draw(&[0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00])
-                .ok();
-        }
+        select_one ^= true;
         led.toggle().ok();
     }
 }
