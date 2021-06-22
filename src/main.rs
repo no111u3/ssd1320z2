@@ -67,23 +67,32 @@ fn main() -> ! {
 
     display.init();
 
-    display.set_draw_area((138, 78), (138 + 83, 78 + 23));
+    display.set_draw_area((190, 78), (190 + 83, 78 + 23));
     for _ in 0..(54 * 44) {
         display.draw(&[0x00]);
     }
-    display.set_draw_area((140, 80), (140 + 79, 80 + 19));
+    display.set_draw_area((192, 80), (192 + 79, 80 + 19));
     for i in 0..(50 * 40) {
         display.draw(&[(i % 4) as u8 | (((i >> 2) % 4) << 2) as u8]);
     }
 
-    let mut select_one = true;
-
+    let mut select_figure = 0;
     loop {
         delay.delay_ms(500_u16);
-        let (begin, end) = if select_one {
-            ((10, 10), (89, 89))
-        } else {
-            ((160 + 10, 10), (160 + 41, 41))
+        let (begin, end) = match select_figure {
+            0 => {
+                select_figure = 1;
+                ((10, 10), (89, 89))
+            }
+
+            1 => {
+                select_figure = 2;
+                ((100, 10), (100 + 79, 89))
+            }
+            _ => {
+                select_figure = 0;
+                ((180 + 10, 10), (180 + 41, 41))
+            }
         };
         display.set_draw_area(begin, end);
         for _ in 0..((end.1 - begin.1 + 1) / 16) {
@@ -98,7 +107,6 @@ fn main() -> ! {
                     .ok();
             }
         }
-        select_one ^= true;
         led.toggle().ok();
     }
 }

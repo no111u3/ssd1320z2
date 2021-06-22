@@ -5,6 +5,8 @@ mod command;
 mod display;
 mod error;
 
+use core::cmp::min;
+
 use display_interface::{DisplayError, WriteOnlyDataCommand};
 use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
@@ -61,7 +63,7 @@ impl Frame {
 pub struct Ssd1320z2<DI, CS1, CS2> {
     interface: Ssd1320<DI>,
     frame: Frame,
-    position: (u16, u16),
+    position: u16,
     cs1: CS1,
     cs2: CS2,
 }
@@ -77,7 +79,7 @@ where
         Self {
             interface: Ssd1320::new(interface),
             frame: Frame::new(),
-            position: (0, 0),
+            position: 0,
             cs1,
             cs2,
         }
@@ -123,7 +125,7 @@ where
             let (one, two) = self.frame.split_to_two();
             let one = one.normalize().as_u8();
             let two = two.normalize().as_u8();
-            self.position = (0, 0);
+            self.position = 0;
             self.select_one();
             self.interface.set_draw_area(one.0, one.1)?;
             self.select_two();
@@ -146,28 +148,27 @@ where
     pub fn draw(&mut self, buffer: &[u8]) -> Result<(), DisplayError> {
         let Frame { start, end } = self.frame;
         if start.0 < 160 && end.0 >= 160 {
-            // TODO: rewrite to more efficient way
-            let x_size = end.0 - start.0;
+            let x_size = end.0 - start.0 + 1;
             let x_limit = 160 - start.0;
-            let y_size = end.1 - start.1;
+            let buffer_len = buffer.len() as u16;
+            let mut index = 0;
 
-            for i in buffer.iter() {
-                if self.position.0 <= x_limit {
+            while index < buffer_len {
+                let advance = if self.position < x_limit {
                     self.select_one();
+
+                    (x_limit - self.position) / 2
                 } else {
                     self.select_two();
-                }
-                self.interface.draw(&[*i])?;
-                if self.position.0 < x_size - 1 {
-                    self.position.0 += 2;
-                } else {
-                    if self.position.1 < y_size {
-                        self.position.1 += 1;
-                    } else {
-                        self.position.1 = 0;
-                    }
-                    self.position.0 = 0;
-                }
+
+                    (x_size - self.position) / 2
+                };
+                let available_advance = min(advance, buffer_len - index);
+                let end_index = available_advance + index;
+                self.interface
+                    .draw(&buffer[index as usize..end_index as usize])?;
+                self.position = (self.position + available_advance * 2) % x_size;
+                index = end_index;
             }
         } else {
             if start.0 < 160 {
