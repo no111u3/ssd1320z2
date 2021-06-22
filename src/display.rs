@@ -44,7 +44,7 @@ where
         Command::PreChargeLevel(PreChargeLvl::V050).send(&mut self.interface)?;
         Command::LineralLUT.send(&mut self.interface)?;
         Command::ReverseComDir(com_reverse).send(&mut self.interface)?;
-        Command::PreChargePeriod(0xc, 0x2).send(&mut self.interface)?;
+        Command::PreChargePeriod(0x7, 0x0).send(&mut self.interface)?;
         Command::ComPinConfig(true, true).send(&mut self.interface)?;
         Command::VP.send(&mut self.interface)?;
         Command::VcomhDeselect(VcomhLevel::V080).send(&mut self.interface)?;
