@@ -67,7 +67,7 @@ where
     /// drawn. This method can be used for changing the affected area on the screen as well
     /// as (re-)setting the start point of the next `draw` call.
     pub fn set_draw_area(&mut self, start: (u8, u8), end: (u8, u8)) -> Result<(), DisplayError> {
-        Command::ColumnAddress(start.0 / 2, (end.0 / 2)).send(&mut self.interface)?;
+        Command::ColumnAddress(start.0 / 2, end.0 / 2).send(&mut self.interface)?;
 
         Command::RowAddress(start.1.into(), (end.1).into()).send(&mut self.interface)?;
 

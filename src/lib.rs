@@ -2,6 +2,7 @@
 //! Generic SPI interface for display drivers
 
 mod command;
+mod consts;
 mod display;
 mod error;
 
@@ -10,6 +11,7 @@ use core::cmp::min;
 use display_interface::{DisplayError, WriteOnlyDataCommand};
 use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
+use consts::{ssd1320, ssd1320z2};
 use display::Ssd1320;
 
 #[derive(Copy, Clone, Debug)]
@@ -22,14 +24,14 @@ impl Frame {
     fn new() -> Self {
         Self {
             start: (0, 0),
-            end: (320, 132),
+            end: (ssd1320z2::NUM_PIXELS_COLS, ssd1320z2::NUM_PIXELS_ROWS),
         }
     }
 
     fn normalize(&self) -> Self {
         Self {
-            start: (self.start.0 % 160, self.start.1),
-            end: (self.end.0 % 160, self.end.1),
+            start: (self.start.0 % ssd1320::NUM_PIXELS_COLS, self.start.1),
+            end: (self.end.0 % ssd1320::NUM_PIXELS_COLS, self.end.1),
         }
     }
 
@@ -40,7 +42,7 @@ impl Frame {
         (
             Self {
                 start: (start_x, self.start.1),
-                end: (159, self.end.1),
+                end: (ssd1320::PIXEL_COL_MAX, self.end.1),
             },
             Self {
                 start: (0, self.start.1),
@@ -121,7 +123,7 @@ where
         end: (u16, u16),
     ) -> Result<(), DisplayError> {
         self.frame = Frame { start, end };
-        if start.0 < 160 && end.0 >= 160 {
+        if start.0 < ssd1320::NUM_PIXELS_COLS && end.0 >= ssd1320::NUM_PIXELS_COLS {
             let (one, two) = self.frame.split_to_two();
             let one = one.normalize().as_u8();
             let two = two.normalize().as_u8();
@@ -131,7 +133,7 @@ where
             self.select_two();
             self.interface.set_draw_area(two.0, two.1)?;
         } else {
-            if start.0 < 160 {
+            if start.0 < ssd1320::NUM_PIXELS_COLS {
                 self.select_one();
             } else {
                 self.select_two();
@@ -147,9 +149,9 @@ where
 
     pub fn draw(&mut self, buffer: &[u8]) -> Result<(), DisplayError> {
         let Frame { start, end } = self.frame;
-        if start.0 < 160 && end.0 >= 160 {
+        if start.0 < ssd1320::NUM_PIXELS_COLS && end.0 >= ssd1320::NUM_PIXELS_COLS {
             let x_size = end.0 - start.0 + 1;
-            let x_limit = 160 - start.0;
+            let x_limit = ssd1320::NUM_PIXELS_COLS - start.0;
             let buffer_len = buffer.len() as u16;
             let mut index = 0;
 
@@ -171,7 +173,7 @@ where
                 index = end_index;
             }
         } else {
-            if start.0 < 160 {
+            if start.0 < ssd1320::NUM_PIXELS_COLS {
                 self.select_one();
             } else {
                 self.select_two();
