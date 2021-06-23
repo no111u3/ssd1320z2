@@ -29,6 +29,9 @@ pub mod ssd1320z2 {
     /// The maximum supported display size height in pixels.
     pub const NUM_PIXELS_ROWS: u16 = 132;
 
+    /// The number of display RAM columns addresses.
+    pub const NUM_BUF_COLS: u16 = NUM_PIXELS_COLS / 2;
+
     // The highest valid pixel column index.
     pub const PIXEL_COL_MAX: u16 = NUM_PIXELS_COLS - 1;
 
