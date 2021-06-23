@@ -40,7 +40,7 @@ where
         Command::AddressMode(AddrMode::Horizontal).send(&mut self.interface)?;
         Command::PortraitAddressMode(PortraitAddrMode::Normal).send(&mut self.interface)?;
         Command::StartLine(0).send(&mut self.interface)?;
-        Command::Contrast(0x6b).send(&mut self.interface)?;
+        Command::Contrast(0x70).send(&mut self.interface)?;
         Command::SegmentRemap(regmap).send(&mut self.interface)?;
         Command::AllOn(false).send(&mut self.interface)?;
         Command::Invert(false).send(&mut self.interface)?;
@@ -48,8 +48,8 @@ where
         Command::PreChargeLevel(PreChargeLvl::V050).send(&mut self.interface)?;
         Command::LineralLUT.send(&mut self.interface)?;
         Command::ReverseComDir(com_reverse).send(&mut self.interface)?;
-        Command::PreChargePeriod(0x7, 0x0).send(&mut self.interface)?;
-        Command::ComPinConfig(true, true).send(&mut self.interface)?;
+        Command::PreChargePeriod(0xa, 0x0).send(&mut self.interface)?;
+        Command::ComPinConfig(true, false).send(&mut self.interface)?;
         Command::VP.send(&mut self.interface)?;
         Command::VcomhDeselect(VcomhLevel::V080).send(&mut self.interface)?;
         Command::DisplayOn(true).send(&mut self.interface)?;

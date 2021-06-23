@@ -1,6 +1,7 @@
 #![no_std]
 //! Generic SPI interface for display drivers
 
+pub mod buffered_graphics;
 mod command;
 mod consts;
 mod display;
@@ -25,7 +26,7 @@ impl Frame {
     fn new() -> Self {
         Self {
             start: (0, 0),
-            end: (ssd1320z2::NUM_PIXELS_COLS, ssd1320z2::NUM_PIXELS_ROWS),
+            end: (ssd1320z2::PIXEL_COL_MAX, ssd1320z2::PIXEL_ROW_MAX),
         }
     }
 

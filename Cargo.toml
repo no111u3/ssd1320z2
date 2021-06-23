@@ -1,8 +1,16 @@
 [package]
 name = "ssd1320"
 version = "0.1.0"
+categories = ["embedded", "no-std"]
 authors = ["Boris Vinogradov <no111u3@gmail.com>"]
+description = "SPI driver for the SSD1320(z2) OLED display controller"
+documentation = "https://docs.rs/ssd1320"
+keywords = ["no-std", "ssd1320", "oled", "embedded", "embedded-hal-driver"]
+readme = "README.md"
+license = "Apache-2.0"
+repository = "https://github.com/no111u3/ssd1320z2"
 edition = "2018"
+exclude = [ "memory.x", "*.bmp", ".cargo", "Embed.toml" ]
 
 [dependencies]
 embedded-hal = "0.2"
@@ -19,6 +27,8 @@ stm32f4xx-hal = { version = "0.8", features = ["rt", "stm32f401"]}
 rtt-target = { version = "0.2.0", features = ["cortex-m"] }
 panic-rtt-target = { version = "0.1.0", features = ["cortex-m"] }
 embedded-graphics = "0.7"
+# Used to load BMP images in various examples
+tinybmp = "0.3.1"
 
 [features]
 default = ["graphics"]
