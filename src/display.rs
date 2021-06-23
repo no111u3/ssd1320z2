@@ -3,7 +3,11 @@
 //! TODO: Create a normal documentation
 
 use crate::command::{AddrMode, Command, PortraitAddrMode, PreChargeLvl, VcomhLevel};
+use crate::error::Error;
+
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
+use display_interface_spi::SPIInterfaceNoCS;
+use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 /// SSD1320 driver.
 #[derive(Copy, Clone, Debug)]
@@ -85,4 +89,32 @@ where
     pub fn set_row(&mut self, row: u8) -> Result<(), DisplayError> {
         Command::RowAddress(row, 0x83).send(&mut self.interface)
     }
+
+    /// Reset the display.
+    pub fn reset<RST, DELAY, PinE>(
+        &mut self,
+        rst: &mut RST,
+        delay: &mut DELAY,
+    ) -> Result<(), Error<(), PinE>>
+    where
+        RST: OutputPin<Error = PinE>,
+        DELAY: DelayMs<u8>,
+    {
+        inner_reset(rst, delay)
+    }
+}
+
+fn inner_reset<RST, DELAY, PinE>(rst: &mut RST, delay: &mut DELAY) -> Result<(), Error<(), PinE>>
+where
+    RST: OutputPin<Error = PinE>,
+    DELAY: DelayMs<u8>,
+{
+    rst.set_high().map_err(Error::Pin)?;
+    delay.delay_ms(1);
+    rst.set_low().map_err(Error::Pin)?;
+    delay.delay_ms(10);
+    rst.set_high().map_err(Error::Pin)?;
+    delay.delay_ms(20);
+
+    Ok(())
 }

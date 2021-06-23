@@ -13,6 +13,7 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use consts::{ssd1320, ssd1320z2};
 use display::Ssd1320;
+use error::Error;
 
 #[derive(Copy, Clone, Debug)]
 struct Frame {
@@ -183,5 +184,18 @@ where
         self.unselect_all();
 
         Ok(())
+    }
+
+    /// Reset the display.
+    pub fn reset<RST, DELAY, PinE>(
+        &mut self,
+        rst: &mut RST,
+        delay: &mut DELAY,
+    ) -> Result<(), Error<(), PinE>>
+    where
+        RST: OutputPin<Error = PinE>,
+        DELAY: DelayMs<u8>,
+    {
+        self.interface.reset(rst, delay)
     }
 }

@@ -50,20 +50,11 @@ fn main() -> ! {
 
     let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), mode, 8_000_000.hz(), clocks);
 
-    let mut reset = || {
-        res.set_high().ok();
-        delay.delay_ms(1u16);
-        res.set_low().ok();
-        delay.delay_ms(10u16);
-        res.set_high().ok();
-        delay.delay_ms(20u16);
-    };
-
     let iface = SPIInterfaceNoCS::new(spi, dc);
 
     let mut display = Ssd1320z2::new(iface, cs1, cs2);
 
-    reset();
+    display.reset(&mut res, &mut delay);
 
     display.init();
 
